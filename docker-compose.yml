@@ -1,0 +1,30 @@
+version: "1.2"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-container
+    environment:
+      POSTGRES_DB: grocery_store
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  grocery-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: grocery-app
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/grocery_store
+      SPRING_DATASOURCE_USERNAME: username
+      SPRING_DATASOURCE_PASSWORD: password
+      LOGGING_LEVEL_ROOT: INFO
+#      SERVER_PORT: 8090
+    ports:
+      - "8088:8088"
+    links:
+      - postgres
