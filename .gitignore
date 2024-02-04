@@ -35,6 +35,7 @@ build/
 ### Others ###
 /logs
 *.log
+mvnw
 
 ## mac files
 .DS_Store
