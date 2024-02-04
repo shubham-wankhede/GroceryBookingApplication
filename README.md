@@ -13,7 +13,7 @@ user login authentication to get jwt token and api's to purchase and manage
 1. clone the project using below command (make sure you have the git client installed otherwise you can directly download the project as zip and extract it).
 
     ```bash 
-    git clone <url>
+    git clone https://github.com/shubham-wankhede/qp-assessment.git
 
 2. once you project cloned or extracted build/install the project using below command.
 
