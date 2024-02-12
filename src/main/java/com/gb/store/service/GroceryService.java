@@ -10,6 +10,7 @@ import com.gb.store.repo.entity.GroceryItem;
 import com.gb.store.utils.GroceryItemMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,9 +54,17 @@ public class GroceryService {
      * @return all grocery items in store
      */
     @Transactional(readOnly = true)
-    public List<GroceryItemResponse> getAllGroceryItems() {
-        final List<GroceryItem> groceries = groceryItemRepository.findAll();
-        return groceries.stream().map(this.groceryItemMapper::mapToGroceryItemResponse).toList();
+    public Page<GroceryItemResponse> getAllGroceryItems(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+
+        Page<GroceryItem> groceriesPage = groceryItemRepository.findAll(pageable);
+
+        List<GroceryItemResponse> groceriesResponsePage
+                = groceriesPage.map(this.groceryItemMapper::mapToGroceryItemResponse).toList();
+
+        return new PageImpl<>(groceriesResponsePage,pageable,groceriesPage.getTotalElements());
+
     }
 
     /**

@@ -26,6 +26,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -83,6 +87,11 @@ class GroceryStoreRestControllerTest {
     @Test
     void getAllGroceries_withUser() throws Exception {
 
+        int pageNo = 0;
+        int pageSize = 1;
+        String sortBy = "name";
+        String sortDir = "asc";
+
         //response object
         GroceryItemResponse groceryItemResponse =
                 GroceryItemResponse.builder()
@@ -93,11 +102,14 @@ class GroceryStoreRestControllerTest {
 
         List<GroceryItemResponse> groceryItemResponseList = List.of(groceryItemResponse);
 
+        Sort sort = Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+
         //expected response
         String expectedResponseGroceryItems = objectMapper.writeValueAsString(groceryItemResponseList);
 
         //mocking
-        Mockito.when(groceryService.getAllGroceryItems()).thenReturn(groceryItemResponseList);
+        Mockito.when(groceryService.getAllGroceryItems(pageNo,pageSize,sortBy,sortDir)).thenReturn(new PageImpl<>(groceryItemResponseList,pageable,1));
 
         //api call
         mockMvc.perform(MockMvcRequestBuilders
@@ -106,7 +118,8 @@ class GroceryStoreRestControllerTest {
                         .content(MediaType.APPLICATION_JSON_VALUE)
                 )
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value("12345"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id").value("12345"));
     }
 
     @Test

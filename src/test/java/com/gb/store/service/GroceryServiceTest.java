@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -37,6 +38,15 @@ class GroceryServiceTest {
     @Test
     void getAllGroceryItems() {
         //request
+
+        int pageNo = 0;
+        int pageSize = 1;
+        String sortBy = "name";
+        String sortDir = "asc";
+
+        Sort sort = Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+
         GroceryItem groceryItem = GroceryItem.builder()
                 .id("12345")
                 .name("Soap")
@@ -46,13 +56,22 @@ class GroceryServiceTest {
 
         List<GroceryItem> groceryItemList = List.of(groceryItem);
 
+        GroceryItemResponse groceryItemResponse = GroceryItemResponse.builder()
+                .id("12345")
+                .name("Soap")
+                .quantity(5)
+                .price(100.5)
+                .build();
+
         //mocking
-        Mockito.when(groceryItemRepository.findAll()).thenReturn(groceryItemList);
+        Mockito.when(groceryItemRepository.findAll(pageable)).thenReturn(new PageImpl<>(groceryItemList,pageable,1));
+        Mockito.when(groceryItemMapper.mapToGroceryItemResponse(groceryItem)).thenReturn(groceryItemResponse);
 
         //call the service
-        List<GroceryItemResponse> responseList = groceryService.getAllGroceryItems();
+        Page<GroceryItemResponse> responses = groceryService.getAllGroceryItems(pageNo,pageSize,sortBy,sortDir);
 
-        assertEquals(1, responseList.size());
+        assertEquals(1, responses.getTotalElements());
+        assertEquals("12345", responses.getContent().get(0).getId());
 
     }
 
