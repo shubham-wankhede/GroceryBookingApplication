@@ -17,7 +17,7 @@ user login authentication to get jwt token and api's to purchase and manage
 
 2. once you project cloned or extracted build/install the project using below command.
 
-   >  important : please install maven if you don't have it installed in your system.
+   >  important : Before you do mvn install make sure you have PostgreSQL is runing if not please start and you can stop it once your install is complete. (You can follow approach 2 to see how to start postgresql from docker)
 
     ```bash
    mvn clean install 
@@ -57,6 +57,7 @@ user login authentication to get jwt token and api's to purchase and manage
 #### Approach (3) : Using Docker Compose ## SIMPLEST
 
 1. if you have docker installed the run below docker-compose file ad that's all
+   > important : make sure your 8088 and 5432 port is free and there is no other processes running on it.
 
     ```bash
    docker-compose up -d
